@@ -7,7 +7,7 @@ local function weights_init(m)
   if name:find('Convolution') then
     m.weight:normal(0.0, 0.02)
     m.bias:fill(0)
-  elseif name:find('BatchNormalization') then
+  elseif name:find('Normalization') then
     if m.weight then m.weight:normal(1.0, 0.02) end
     if m.bias then m.bias:fill(0) end
   end
@@ -223,11 +223,8 @@ local function build_res_block(dim, padding_type)
   local res_block = nn.Sequential()
   local concat = nn.ConcatTable()
   concat:add(conv_block)
-  if padding_type == 'none' or padding_type == 'reflect-start' then
-    concat:add(nn.ShaveImage(2))
-  else
-    concat:add(nn.Identity())
-  end
+  concat:add(nn.Identity())
+  
   res_block:add(concat):add(nn.CAddTable())
   return res_block
 end
